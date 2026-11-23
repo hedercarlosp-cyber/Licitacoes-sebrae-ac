@@ -1,0 +1,1112 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Licitações SEBRAE/AC 2026</title>
+<meta name="description" content="Painel de gestão das licitações homologadas pelo SEBRAE no Acre em 2026: valores, economia, prazos, fornecedores e pontos de atenção.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<style>
+/* Layout: coluna única até 1240px; seções em grade que vira uma coluna no celular. */
+:root {
+  --color-bg: #f6f7fa; --color-panel: #ffffff; --color-fg: #17202e; --color-fg-muted: #5a6577;
+  --color-border-line: #dde2ea; --color-ok: #1b7f4b; --color-warn: #a4640a; --color-bad: #b3261e;
+  --c1: #2f5fd0; --c2: #1f9e89; --c3: #8a5cd0; --c4: #d0782f;
+  --cds-chart-muted: #d5dbe6; --cds-chart-grid: #e7ebf1; --cds-chart-axis: #a3adbd; --cds-chart-reference: #5a6577;
+  --cds-text-secondary: #5a6577; --cds-surface-popover: #ffffff; --cds-border: #d3d9e3; --cds-shadow-popover: 0 6px 24px rgba(20, 30, 50, .12);
+  --font-anthropic-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-anthropic-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --cds-font-size-caption: .8125rem; --cds-font-size-body: 1rem; --cds-font-size-heading: 1.15rem; --cds-font-size-title: 2.1rem;
+  --cds-font-weight-medium: 600;
+  --cds-gap-xs: 4px; --cds-gap-sm: 8px; --cds-gap-md: 14px; --cds-gap-lg: 20px; --cds-gap-xl: 36px;
+  --cds-pad-md: 12px; --cds-pad-lg: 18px; --cds-radius: 8px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #11161f; --color-panel: #19202c; --color-fg: #e8ecf3; --color-fg-muted: #9aa5b8;
+    --color-border-line: #2a3343; --color-ok: #4cc38a; --color-warn: #e2a64b; --color-bad: #f07a72;
+    --c1: #6f98ff; --c2: #3cc7ad; --c3: #b18cf0; --c4: #f0a060;
+    --cds-chart-muted: #333d4f; --cds-chart-grid: #252e3d; --cds-chart-axis: #4c5870; --cds-chart-reference: #9aa5b8;
+    --cds-text-secondary: #9aa5b8; --cds-surface-popover: #1f2735; --cds-border: #364156; --cds-shadow-popover: 0 6px 24px rgba(0, 0, 0, .45);
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+img, svg { max-width: 100%; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--color-bg); color: var(--color-fg); font-family: var(--font-anthropic-sans); font-size: 15px; line-height: 1.45; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-block: 32px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.dash-select { font: inherit; font-size: var(--cds-font-size-caption); color: var(--color-fg); background-color: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: 7px 30px 7px 10px; appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238893a6' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }
+.dash-select:focus-visible { outline: 2px solid var(--c1); outline-offset: 1px; }
+.lic-status { border: 1px solid var(--color-border-line); background: var(--color-panel); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); display: grid; gap: var(--cds-gap-sm); }
+.lic-status p { margin: 0; }
+.lic-foot { margin-top: var(--cds-gap-xl); padding-top: var(--cds-gap-md); border-top: 1px solid var(--color-border-line); color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); display: flex; flex-wrap: wrap; gap: var(--cds-gap-md); justify-content: space-between; }
+@media (max-width: 520px) { :root { --cds-font-size-title: 1.65rem; } .lic-tile-v { font-size: 1.55rem !important; } .lic-bar { grid-template-columns: minmax(5rem, 38%) 1fr minmax(4.5rem, auto) !important; } }
+@media (prefers-reduced-motion: no-preference) { .lic-bar-o, .lic-bar-i { transition: width .35s ease-out; } }
+.lic { display: grid; gap: var(--cds-gap-xl); font-family: var(--font-anthropic-sans); color: var(--color-fg); }
+.lic h1 { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; text-wrap: balance; }
+.lic h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: 0; text-wrap: balance; }
+.lic-eyebrow { font-size: var(--cds-font-size-caption); letter-spacing: .06em; text-transform: uppercase; color: var(--color-fg-muted); margin: 0 0 var(--cds-gap-xs); }
+.lic-lede { font-size: var(--cds-font-size-body); line-height: 1.6; max-width: 70ch; margin: var(--cds-gap-sm) 0 0; }
+.lic-lede b, .lic-note b { font-variant-numeric: tabular-nums; font-weight: var(--cds-font-weight-medium); }
+.lic-note { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); line-height: 1.5; margin: var(--cds-gap-xs) 0 0; max-width: 75ch; }
+.lic-filters { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm); align-items: end; }
+.lic-filters label { display: grid; gap: var(--cds-gap-xs); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.lic-filters .dash-select { min-width: 12rem; max-width: 100%; }
+.lic-btn { font: inherit; font-size: var(--cds-font-size-caption); padding: 6px 12px; border-radius: var(--cds-radius); border: 1px solid var(--color-border-line); background-color: var(--color-panel); color: var(--color-fg); cursor: pointer; }
+.lic-btn:hover { border-color: var(--color-fg-muted); }
+.lic-btn:focus-visible, .lic-th-sort:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 2px; }
+.lic-active { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.lic-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr)); gap: var(--cds-gap-md); }
+.lic-tile { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); display: grid; gap: var(--cds-gap-xs); align-content: start; min-width: 0; }
+.lic-tile-l { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.lic-tile-v { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: 1.9rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.lic-tile-s { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); font-variant-numeric: tabular-nums; }
+.lic-sec { display: grid; gap: var(--cds-gap-md); min-width: 0; }
+.lic-sec-h { display: grid; gap: var(--cds-gap-xs); }
+.lic-grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: var(--cds-gap-xl); }
+.lic-chart { position: relative; min-width: 0; }
+.lic-chart.lic-tall { min-height: 280px; }
+.lic-chart svg { display: block; overflow: visible; }
+.lic-chart svg text { fill: var(--cds-text-secondary); font-size: 11px; font-family: var(--font-anthropic-sans); font-variant-numeric: tabular-nums; }
+.lic-chart svg .lic-strong { fill: var(--color-fg); font-weight: 600; }
+.lic-legend { display: flex; flex-wrap: wrap; gap: var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin: 0; padding: 0; list-style: none; }
+.lic-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.lic-sw { width: 10px; height: 10px; border-radius: 2px; display: inline-block; background: var(--cds-chart-muted); }
+.lic-sw.lic-round { border-radius: 50%; }
+.lic-bars { display: grid; gap: 6px; position: relative; min-height: 2rem; }
+.lic-bar { display: grid; grid-template-columns: minmax(6rem, 32%) 1fr minmax(5.5rem, auto); gap: var(--cds-gap-sm); align-items: center; font-size: var(--cds-font-size-caption); padding: 2px 0; }
+.lic-bar-l { overflow-wrap: anywhere; }
+.lic-bar-t { position: relative; height: 16px; }
+.lic-bar-o, .lic-bar-i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 2px; }
+.lic-bar-v { text-align: right; font-variant-numeric: tabular-nums; color: var(--color-fg-muted); white-space: nowrap; }
+.lic-bar:hover .lic-bar-l { color: var(--color-fg); text-decoration: underline; }
+.lic-tip { position: absolute; z-index: 5; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); box-shadow: var(--cds-shadow-popover); border-radius: var(--cds-radius); padding: 8px 10px; font-size: var(--cds-font-size-caption); line-height: 1.45; max-width: 18rem; color: var(--color-fg); }
+.lic-tip div:first-child { font-weight: 600; }
+.lic-tip div + div { color: var(--cds-text-secondary); font-variant-numeric: tabular-nums; }
+.lic-tablewrap { overflow-x: auto; border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); }
+.lic-table { width: 100%; border-collapse: collapse; font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+.lic-table th, .lic-table td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--color-border-line); vertical-align: top; }
+.lic-table th { color: var(--color-fg-muted); font-weight: var(--cds-font-weight-medium); background: var(--color-panel); white-space: nowrap; }
+.lic-table td.n, .lic-table th.n { text-align: right; white-space: nowrap; }
+.lic-table tbody tr:last-child td { border-bottom: 0; }
+.lic-table tbody tr:hover td { background: var(--color-panel); }
+.lic-obj { color: var(--color-fg-muted); display: block; max-width: 34rem; margin-top: 2px; }
+.lic-chip { display: inline-block; padding: 1px 7px; border-radius: 999px; font-size: 11px; white-space: nowrap; border: 1px solid currentColor; }
+.lic-chip.warn { color: var(--color-warn); }
+.lic-chip.bad { color: var(--color-bad); }
+.lic-chip.ok { color: var(--color-ok); }
+.lic-chip + .lic-chip { margin-left: 4px; }
+.lic-th-sort { cursor: pointer; }
+.lic-th-sort:hover { color: var(--color-fg); }
+.lic-empty { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); padding: var(--cds-pad-md) 0; }
+.lic details summary { cursor: pointer; font-weight: var(--cds-font-weight-medium); }
+.lic details ul { line-height: 1.6; max-width: 75ch; padding-left: 1.2rem; }
+@media print { .lic-filters { display: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="lic" lang="pt-BR" data-read>
+  <header id="topo">
+    <p class="lic-eyebrow">SEBRAE no Acre · Gestão de licitações · Exercício 2026</p>
+    <h1>Licitações homologadas em 2026</h1>
+    <p class="lic-lede"><b data-draw="kpi" data-source="kpis" data-field="processos" data-row="0" data-fmt="int">—</b> processos homologados somam <b data-draw="kpi" data-source="kpis" data-field="estimado" data-row="0" data-fmt="brlc">—</b> estimados e foram fechados por <b data-draw="kpi" data-source="kpis" data-field="negociado" data-row="0" data-fmt="brlc">—</b>, uma economia de <b data-draw="kpi" data-source="kpis" data-field="economia" data-row="0" data-fmt="brlc">—</b> (<b data-draw="kpi" data-source="kpis" data-field="pct" data-row="0" data-fmt="pct">—</b>). Empresas sediadas no Acre ficaram com <b data-draw="kpi" data-source="kpis" data-field="pct_acre" data-row="0" data-fmt="pct">—</b> das adjudicações, e micro e pequenas empresas com <b data-draw="kpi" data-source="kpis" data-field="pct_mpe" data-row="0" data-fmt="pct">—</b>.</p>
+  </header>
+
+  <div class="lic-status" id="carga" role="status">
+    <p id="carga-msg">Carregando os dados de Relt_3.csv…</p>
+    <label hidden>Abrir o arquivo CSV: <input type="file" id="carga-arquivo" accept=".csv,text/csv"></label>
+  </div>
+
+  <div class="lic-filters" id="filtros">
+    <label for="f-categoria">Categoria de compra
+      <select id="f-categoria" class="dash-select">
+        <option value="">Todas as categorias</option>
+        <option>Eventos e estruturas</option>
+        <option>Gráfica e promocionais</option>
+        <option>TI e telecom</option>
+        <option>Obras e manutenção predial</option>
+        <option>Alimentação e consumo</option>
+        <option>Transporte e veículos</option>
+        <option>Serviços técnicos e segurança</option>
+        <option>Mobiliário</option>
+      </select>
+    </label>
+    <label for="f-modalidade">Modalidade
+      <select id="f-modalidade" class="dash-select">
+        <option value="">Todas as modalidades</option>
+        <option>Pregão</option>
+        <option>Pregão SRP</option>
+        <option>Convite</option>
+        <option>Credenciamento</option>
+      </select>
+    </label>
+    <button type="button" class="lic-btn" id="f-limpar">Limpar filtros</button>
+  </div>
+
+  <section class="lic-tiles" id="indicadores" aria-label="Indicadores principais">
+    <div class="lic-tile" id="tile-processos">
+      <span class="lic-tile-l">Processos homologados</span>
+      <span class="lic-tile-v" data-draw="kpi" data-source="kpis" data-field="processos" data-row="0" data-fmt="int">—</span>
+      <span class="lic-tile-s"><span data-draw="kpi" data-source="kpis" data-field="adjudicacoes" data-row="0" data-fmt="int">—</span> adjudicações a <span data-draw="kpi" data-source="kpis" data-field="fornecedores" data-row="0" data-fmt="int">—</span> empresas</span>
+    </div>
+    <div class="lic-tile" id="tile-estimado">
+      <span class="lic-tile-l">Valor estimado</span>
+      <span class="lic-tile-v" data-draw="kpi" data-source="kpis" data-field="estimado" data-row="0" data-fmt="brlc">—</span>
+      <span class="lic-tile-s">Referência de preços dos editais</span>
+    </div>
+    <div class="lic-tile" id="tile-negociado">
+      <span class="lic-tile-l">Valor negociado</span>
+      <span class="lic-tile-v" data-draw="kpi" data-source="kpis" data-field="negociado" data-row="0" data-fmt="brlc">—</span>
+      <span class="lic-tile-s">Após disputa de lances</span>
+    </div>
+    <div class="lic-tile" id="tile-economia">
+      <span class="lic-tile-l">Economia obtida</span>
+      <span class="lic-tile-v" data-draw="kpi" data-source="kpis" data-field="economia" data-row="0" data-fmt="brlc">—</span>
+      <span class="lic-tile-s"><span data-draw="kpi" data-source="kpis" data-field="pct" data-row="0" data-fmt="pct">—</span> do valor estimado</span>
+    </div>
+    <div class="lic-tile" id="tile-prazo">
+      <span class="lic-tile-l">Prazo médio até homologar</span>
+      <span class="lic-tile-v" data-draw="kpi" data-source="kpis" data-field="prazo_medio" data-row="0" data-fmt="dias">—</span>
+      <span class="lic-tile-s">Mediana de <span data-draw="kpi" data-source="kpis" data-field="prazo_mediana" data-row="0" data-fmt="dias">—</span></span>
+    </div>
+    <div class="lic-tile" id="tile-acre">
+      <span class="lic-tile-l">Valor com empresas do Acre</span>
+      <span class="lic-tile-v" data-draw="kpi" data-source="kpis" data-field="pct_valor_acre" data-row="0" data-fmt="pct">—</span>
+      <span class="lic-tile-s">do valor negociado (1ª vencedora)</span>
+    </div>
+  </section>
+
+  <section class="lic-sec" id="mensal">
+    <div class="lic-sec-h">
+      <h2>Valor negociado e economia por mês de homologação</h2>
+      <ul class="lic-legend">
+        <li><span class="lic-sw" data-sw="0"></span>Valor negociado</li>
+        <li><span class="lic-sw" data-sw="1"></span>Economia (estimado − negociado)</li>
+      </ul>
+    </div>
+    <div class="lic-chart lic-tall" data-draw="mensal" data-source="por_mes">—</div>
+    <p class="lic-note">O número sobre cada coluna é a quantidade de processos homologados no mês.</p>
+  </section>
+
+  <div class="lic-grid2">
+    <section class="lic-sec" id="categorias">
+      <div class="lic-sec-h">
+        <h2>Categorias de compra: estimado × negociado</h2>
+        <ul class="lic-legend">
+          <li><span class="lic-sw"></span>Valor estimado</li>
+          <li><span class="lic-sw" data-sw="0"></span>Valor negociado</li>
+        </ul>
+      </div>
+      <div class="lic-bars" data-draw="categorias" data-source="por_categoria"></div>
+      <p class="lic-note">À direita, a economia percentual de cada categoria.</p>
+    </section>
+
+    <section class="lic-sec" id="concentracao">
+      <div class="lic-sec-h">
+        <h2>Concentração do valor nos maiores processos</h2>
+        <p class="lic-note" style="margin:0">Os 5 maiores processos respondem por <b data-draw="pareto-n" data-source="pareto" data-field="acumulado_pct" data-row="4">—</b> de todo o valor estimado.</p>
+      </div>
+      <div class="lic-bars" data-draw="pareto" data-source="pareto"></div>
+      <p class="lic-note">Barras: valor estimado dos 10 maiores processos. À direita, a participação acumulada no total.</p>
+    </section>
+  </div>
+
+  <section class="lic-sec" id="prazo">
+    <div class="lic-sec-h">
+      <h2>Prazo de tramitação × economia</h2>
+      <ul class="lic-legend">
+        <li><span class="lic-sw lic-round" data-sw="0"></span>Pregão</li>
+        <li><span class="lic-sw lic-round" data-sw="1"></span>Pregão SRP</li>
+        <li><span class="lic-sw lic-round" data-sw="2"></span>Convite</li>
+        <li>Tamanho do círculo = valor estimado</li>
+      </ul>
+    </div>
+    <div class="lic-grid2">
+      <div class="lic-chart lic-tall" data-draw="dispersao" data-source="processos">—</div>
+      <div class="lic-sec" style="align-content:start">
+        <div class="lic-tablewrap">
+          <table class="lic-table" data-source="por_faixa" data-row-key="faixa">
+            <thead><tr><th data-field="faixa">Dias até homologar</th><th class="n" data-field="processos">Processos</th><th class="n" data-field="estimado">Estimado</th><th class="n" data-field="pct">Economia</th></tr></thead>
+            <tbody data-draw="tab-faixa"></tbody>
+          </table>
+        </div>
+        <p class="lic-note">Economia ponderada pelo valor: soma da economia dividida pela soma do estimado em cada faixa. A linha tracejada no gráfico marca a economia média do conjunto filtrado.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="lic-sec" id="modalidades">
+    <div class="lic-sec-h">
+      <h2>Pregão comum × Sistema de Registro de Preços</h2>
+    </div>
+    <div class="lic-tablewrap">
+      <table class="lic-table" data-source="por_modalidade" data-row-key="modalidade">
+        <thead><tr><th data-field="modalidade">Modalidade</th><th class="n" data-field="processos">Processos</th><th class="n" data-field="estimado">Estimado</th><th class="n" data-field="negociado">Negociado</th><th class="n" data-field="economia">Economia</th><th class="n" data-field="pct">Economia %</th><th class="n" data-field="prazo_medio">Prazo médio</th><th class="n" data-field="vencedores_por_processo">Vencedoras por processo</th></tr></thead>
+        <tbody data-draw="tab-modalidade"></tbody>
+      </table>
+    </div>
+    <p class="lic-note">No registro de preços o valor é um teto de contratação sob demanda; o que será de fato executado depende das ordens de fornecimento.</p>
+  </section>
+
+  <section class="lic-sec" id="fornecedores">
+    <div class="lic-sec-h">
+      <h2>Quem vence: origem e porte das empresas</h2>
+      <p class="lic-note" style="margin:0">Cada adjudicação conta uma vez: um registro de preços com quatro empresas vencedoras soma quatro adjudicações.</p>
+    </div>
+    <div class="lic-grid2">
+      <div class="lic-sec">
+        <h3 class="lic-tile-l" style="margin:0">Sede da empresa vencedora</h3>
+        <div class="lic-bars" data-draw="origem" data-source="por_origem"></div>
+      </div>
+      <div class="lic-sec">
+        <h3 class="lic-tile-l" style="margin:0">Porte da empresa vencedora</h3>
+        <div class="lic-bars" data-draw="porte" data-source="por_porte"></div>
+      </div>
+    </div>
+    <div class="lic-tablewrap">
+      <table class="lic-table" data-source="porte_origem" data-row-key="porte">
+        <thead><tr><th data-field="porte">Porte × sede</th><th class="n" data-field="rio_branco">Rio Branco</th><th class="n" data-field="cruzeiro_do_sul">Cruzeiro do Sul</th><th class="n" data-field="interior_acre">Interior do Acre</th><th class="n" data-field="outros_estados">Outros estados</th><th class="n" data-field="total">Total</th></tr></thead>
+        <tbody data-draw="tab-porte-origem"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="lic-sec" id="recorrentes">
+    <div class="lic-sec-h">
+      <h2>Fornecedores que venceram mais de um processo</h2>
+      <p class="lic-note" style="margin:0">Agrupados por CNPJ, o que une empresas registradas com nomes diferentes na planilha. O valor considera só os processos em que a empresa foi a 1ª vencedora.</p>
+    </div>
+    <div class="lic-tablewrap">
+      <table class="lic-table" data-source="top_fornecedores" data-row-key="cnpj">
+        <thead><tr><th data-field="fornecedor">Empresa</th><th data-field="cnpj">CNPJ</th><th data-field="sede">Sede</th><th data-field="porte">Porte</th><th class="n" data-field="processos">Processos</th><th class="n" data-field="principal">Como 1ª vencedora</th><th class="n" data-field="valor_principal">Valor negociado</th><th data-field="categorias">Categorias</th></tr></thead>
+        <tbody data-draw="tab-recorrentes"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="lic-sec" id="processos">
+    <div class="lic-sec-h">
+      <h2>Todos os processos</h2>
+      <p class="lic-note" style="margin:0">Ordenado pelo valor estimado. Clique no título de uma coluna para reordenar.</p>
+    </div>
+    <div class="lic-tablewrap">
+      <table class="lic-table" data-source="processos" data-row-key="id">
+        <thead><tr>
+          <th data-field="processo" class="lic-th-sort" data-sort="processo" tabindex="0">Processo e objeto</th>
+          <th data-field="categoria" class="lic-th-sort" data-sort="categoria" tabindex="0">Categoria</th>
+          <th data-field="homologacao" class="lic-th-sort" data-sort="homologacao" tabindex="0">Homologação</th>
+          <th class="n lic-th-sort" data-field="dias" data-sort="dias" tabindex="0">Dias</th>
+          <th class="n lic-th-sort" data-field="estimado" data-sort="estimado" tabindex="0">Estimado</th>
+          <th class="n lic-th-sort" data-field="negociado" data-sort="negociado" tabindex="0">Negociado</th>
+          <th class="n lic-th-sort" data-field="pct" data-sort="pct" tabindex="0">Economia</th>
+          <th class="n lic-th-sort" data-field="n_vencedores" data-sort="n_vencedores" tabindex="0">Vencedoras</th>
+          <th data-field="alerta">Atenção</th>
+        </tr></thead>
+        <tbody data-draw="tab-processos"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="lic-sec" id="atencao">
+    <div class="lic-sec-h">
+      <h2>Pontos de atenção para a gestão</h2>
+      <p class="lic-note" style="margin:0">Achados do cruzamento dos dados. Economias acima de 60% podem indicar pesquisa de preços superestimada; cadastros divergentes dificultam o controle de fornecedores.</p>
+    </div>
+    <div class="lic-tablewrap">
+      <table class="lic-table" data-source="qualidade" data-row-key="tipo,detalhe">
+        <thead><tr><th data-field="tipo">Tipo</th><th data-field="detalhe">Detalhe</th><th data-field="cnpj">CNPJ</th></tr></thead>
+        <tbody data-draw="tab-qualidade"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <details id="metodologia">
+    <summary>Como os números foram calculados</summary>
+    <ul>
+      <li>Fonte: o arquivo Relt_3.csv, exportado da planilha de licitações do SEBRAE/AC e publicado junto com esta página. Ele é lido a cada vez que a página é aberta. Cada processo ocupa uma linha, e as demais empresas vencedoras de um registro de preços vêm nas linhas logo abaixo.</li>
+      <li>Os valores estimado, negociado e economia são do processo inteiro e aparecem só na linha da 1ª vencedora. Por isso, valores por empresa consideram apenas a 1ª vencedora.</li>
+      <li>Ficam fora dos totais em reais os processos sem valor (como credenciamentos) e os registrados com valores unitários (estimado abaixo de R$ 100, como o PE SRP 29/2026).</li>
+      <li>A linha de total da própria planilha é ignorada; os totais aqui são recalculados processo a processo, por isso podem diferir dela.</li>
+      <li>O prazo é contado em dias corridos entre a publicação e a homologação, recalculado a partir das datas.</li>
+      <li>Empresas foram agrupadas por CNPJ. Os processos existentes em novembro de 2026 têm categoria atribuída manualmente pelo objeto; processos novos são classificados por palavras-chave do objeto (ou em "Outros").</li>
+      <li>Economia percentual de grupos é ponderada pelo valor: soma da economia dividida pela soma do estimado.</li>
+    </ul>
+  </details>
+  <footer class="lic-foot">
+    <span>Fonte dos dados: <span id="atualizado">Relt_3.csv</span></span>
+    <span>Valores em reais (R$). Processos homologados no exercício de 2026.</span>
+  </footer>
+</div>
+</div>
+
+<script>
+// Mini-motor do painel: guarda os dados, calcula sob demanda e redesenha.
+window.dash = (() => {
+  const calcs = {}, draws = [], cache = {};
+  const defaults = { categoria: '', modalidade: '' };
+  let params = { ...defaults };
+  const sources = { planilha: { status: 'loading', data: [] } };
+  const api = {
+    colors: ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)'],
+    params: () => ({ ...params }),
+    setParams(o) { params = { ...params, ...o }; api.run(); },
+    resetParams() { params = { ...defaults }; api.run(); },
+    loader() {},
+    calc(id, def) { calcs[id] = def; },
+    setSource(id, s) { sources[id] = s; api.run(); },
+    data(id) {
+      if (sources[id]) return sources[id];
+      if (cache[id]) return cache[id];
+      const c = calcs[id];
+      if (!c) return { status: 'error', data: [], message: 'Sem dados: ' + id };
+      const ins = c.inputs.map((i) => api.data(i));
+      const bad = ins.find((d) => d.status !== 'ok');
+      if (bad) return { status: bad.status, data: [] };
+      try { cache[id] = { status: 'ok', data: c.fn(...ins.map((d) => d.data)) }; }
+      catch (e) { console.error(id, e); cache[id] = { status: 'error', data: [], message: String(e.message || e) }; }
+      return cache[id];
+    },
+    draw(name, fn) {
+      if (fn) { draws.push([name, fn]); return; }
+      draws.filter(([n]) => n === name).forEach(([n, f]) => document.querySelectorAll(`[data-draw="${n}"]`).forEach((el) => { try { f(el); } catch (e) { console.error(n, e); } }));
+    },
+    run() {
+      for (const k of Object.keys(cache)) delete cache[k];
+      for (const [n, f] of draws) document.querySelectorAll(`[data-draw="${n}"]`).forEach((el) => { try { f(el); } catch (e) { console.error(n, e); } });
+    },
+  };
+  let w = 0, t = null;
+  window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(() => { if (window.innerWidth !== w) { w = window.innerWidth; api.run(); } }, 150); });
+  return api;
+})();
+
+// Leitura do Relt_3.csv (separado por ponto e vírgula, exportado do Excel).
+window.lerCSV = (texto) => {
+  texto = texto.replace(/^﻿/, '');
+  const sm = texto.match(/(^|\n)Processo([;,\t])/);
+  const sep = sm ? sm[2] : ';';
+  const linhas = [];
+  let campo = '', linha = [], aspas = false;
+  for (let i = 0; i < texto.length; i++) {
+    const ch = texto[i];
+    if (aspas) {
+      if (ch === '"') { if (texto[i + 1] === '"') { campo += '"'; i++; } else aspas = false; }
+      else campo += ch;
+    } else if (ch === '"') aspas = true;
+    else if (ch === sep) { linha.push(campo); campo = ''; }
+    else if (ch === '\n' || ch === '\r') {
+      if (ch === '\r' && texto[i + 1] === '\n') i++;
+      linha.push(campo); linhas.push(linha); linha = []; campo = '';
+    } else campo += ch;
+  }
+  if (campo || linha.length) { linha.push(campo); linhas.push(linha); }
+  const cols = ['processo', 'objeto', 'publicacao', 'homologacao', 'dias', 'empresa', 'cnpj', 'sede', 'porte', 'estimado', 'negociado', 'economia', 'pct'];
+  const ini = linhas.findIndex((l) => (l[0] || '').trim() === 'Processo');
+  if (ini < 0) throw new Error('Não achei a linha de cabeçalho ("Processo") no arquivo.');
+  const data = (v) => { const m = String(v).match(/^\s*(\d{2})\/(\d{2})\/(\d{4})/); return m ? `${m[3]}-${m[2]}-${m[1]}` : v; };
+  const out = [];
+  linhas.slice(ini + 1).forEach((l, k) => {
+    const r = { linha: ini + 2 + k };
+    cols.forEach((c, i) => { const v = l[i]; r[c] = v == null || v.trim() === '' ? null : v; });
+    if (cols.every((c) => r[c] == null)) return;
+    if (r.publicacao) r.publicacao = data(r.publicacao);
+    if (r.homologacao) r.homologacao = data(r.homologacao);
+    if (r.dias != null && /^\s*-?\d+\s*$/.test(r.dias)) r.dias = +r.dias;
+    out.push(r);
+  });
+  return out;
+};
+</script>
+<script>
+window.LIC = {
+  brl(v) { return v == null ? '—' : v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }); },
+  brlc(v) {
+    if (v == null || isNaN(v)) return '—';
+    const a = Math.abs(v);
+    if (a >= 1e6) return 'R$ ' + (v / 1e6).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' mi';
+    if (a >= 1e3) return 'R$ ' + (v / 1e3).toLocaleString('pt-BR', { maximumFractionDigits: 0 }) + ' mil';
+    return 'R$ ' + v.toLocaleString('pt-BR', { maximumFractionDigits: 2 });
+  },
+  pct(v) { return v == null || isNaN(v) ? '—' : v.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%'; },
+  int(v) { return v == null ? '—' : Math.round(v).toLocaleString('pt-BR'); },
+  dias(v) { return v == null ? '—' : Math.round(v).toLocaleString('pt-BR') + ' dias'; },
+  dec(v) { return v == null ? '—' : v.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }); },
+  date(s) { return s ? s.slice(8, 10) + '/' + s.slice(5, 7) + '/' + s.slice(0, 4) : '—'; },
+  mes(m) { return ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'][+m.slice(5, 7) - 1] + '/' + m.slice(2, 4); },
+  fmt(kind, v) { return (LIC[kind] || LIC.int)(v); },
+  filt(rows) {
+    const p = dash.params(), c = p.categoria || '', m = p.modalidade || '';
+    return rows.filter((r) => (!c || r.categoria === c) && (!m || r.modalidade === m));
+  },
+  status(el, d) {
+    if (d.status === 'ok') return true;
+    el.replaceChildren();
+    el.textContent = d.status === 'error' ? 'Não foi possível carregar estes dados.' : '—';
+    return false;
+  },
+  tip(el) {
+    let t = el.querySelector(':scope > .lic-tip');
+    if (!t) { t = document.createElement('div'); t.className = 'lic-tip'; t.hidden = true; el.appendChild(t); }
+    return t;
+  },
+  showTip(el, t, ev, lines) {
+    t.replaceChildren(...lines.map((l) => { const d = document.createElement('div'); d.textContent = l; return d; }));
+    t.hidden = false;
+    const b = el.getBoundingClientRect();
+    let x = ev.clientX - b.left + 14, y = ev.clientY - b.top + 14;
+    const w = t.offsetWidth, h = t.offsetHeight;
+    if (x + w > b.width) x = Math.max(0, ev.clientX - b.left - w - 14);
+    if (y + h > b.height + 40) y = Math.max(0, ev.clientY - b.top - h - 10);
+    t.style.left = x + 'px'; t.style.top = y + 'px';
+  },
+  bars(el, rows, color) {
+    el.replaceChildren();
+    if (!rows.length) { const p = document.createElement('p'); p.className = 'lic-empty'; p.textContent = 'Nenhum processo no filtro atual.'; el.append(p); return; }
+    const max = Math.max(...rows.map((r) => r.outer)) || 1;
+    const tip = LIC.tip(el);
+    for (const r of rows) {
+      const row = document.createElement('div'); row.className = 'lic-bar';
+      const lab = document.createElement('span'); lab.className = 'lic-bar-l'; lab.textContent = r.label;
+      const track = document.createElement('span'); track.className = 'lic-bar-t';
+      const o = document.createElement('span'); o.className = 'lic-bar-o';
+      o.style.width = (100 * r.outer / max) + '%';
+      o.style.background = r.inner != null ? 'var(--cds-chart-muted)' : color;
+      track.append(o);
+      if (r.inner != null) {
+        const i = document.createElement('span'); i.className = 'lic-bar-i';
+        i.style.width = (100 * r.inner / max) + '%'; i.style.background = color; track.append(i);
+      }
+      const v = document.createElement('span'); v.className = 'lic-bar-v'; v.textContent = r.text;
+      row.append(lab, track, v);
+      row.addEventListener('pointermove', (ev) => LIC.showTip(el, tip, ev, r.tip));
+      row.addEventListener('pointerleave', () => { tip.hidden = true; });
+      el.append(row);
+    }
+  },
+  cell(tr, text, cls) { const td = document.createElement('td'); if (cls) td.className = cls; td.textContent = text; tr.append(td); return td; },
+  chip(td, text, kind) { const s = document.createElement('span'); s.className = 'lic-chip ' + kind; s.textContent = text; td.append(s); },
+  sort: { key: 'estimado', dir: -1 },
+};
+
+document.querySelectorAll('[data-sw]').forEach((s) => { s.style.background = dash.colors[+s.dataset.sw]; });
+
+// filtros
+(() => {
+  const cat = document.getElementById('f-categoria'), mod = document.getElementById('f-modalidade'), clr = document.getElementById('f-limpar');
+  const p = dash.params();
+  if (cat) { cat.value = p.categoria || ''; cat.addEventListener('change', () => dash.setParams({ categoria: cat.value })); }
+  if (mod) { mod.value = p.modalidade || ''; mod.addEventListener('change', () => dash.setParams({ modalidade: mod.value })); }
+  if (clr) clr.addEventListener('click', () => { dash.resetParams(); if (cat) cat.value = ''; if (mod) mod.value = ''; });
+  document.querySelectorAll('.lic-th-sort').forEach((th) => {
+    const go = () => {
+      const k = th.dataset.sort;
+      LIC.sort = { key: k, dir: LIC.sort.key === k ? -LIC.sort.dir : (['processo', 'categoria', 'homologacao'].includes(k) ? 1 : -1) };
+      dash.draw('tab-processos');
+    };
+    th.addEventListener('click', go);
+    th.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+  });
+})();
+</script>
+<script>
+// ---------- dados do Relt_3.csv ----------
+dash.calc('processos', {
+  inputs: ['planilha'],
+  title: 'Processos homologados',
+  description: 'Uma linha por processo: valores convertidos para número, prazo recalculado pelas datas, modalidade e categoria de compra.',
+  fn: (planilha) => {
+  const limpa = (s) => String(s ?? '').replace(/ /g, ' ').replace(/\s+/g, ' ').trim();
+  const dinheiro = (v) => {
+    if (v == null || v === '') return null;
+    if (typeof v === 'number') return v;
+    const s = String(v).replace(/R\$|\s| /g, '');
+    if (!/\d/.test(s)) return null;
+    let m;
+    if (/^-?\d{1,3}(\.\d{3})*(,\d+)?$/.test(s)) return +s.replace(/\./g, '').replace(',', '.');
+    if (/^-?\d{1,3}(,\d{3})*(\.\d+)?$/.test(s)) return +s.replace(/,/g, '');
+    if ((m = s.match(/^(-?[\d.,]+)[.,](\d{2})$/))) return +(m[1].replace(/[.,]/g, '') + '.' + m[2]);
+    return isNaN(+s) ? null : +s;
+  };
+  const brOk = (v) => typeof v === 'number' || /^\s*R\$\s*-?\d{1,3}(\.\d{3})*,\d{2}\s*$/.test(String(v));
+  const pctPlan = (v) => {
+    if (v == null || v === '') return null;
+    if (typeof v === 'number') return v * 100;
+    const s = String(v).replace(/\s|%/g, '');
+    const n = /,/.test(s) ? +s.replace(/\./g, '').replace(',', '.') : +s;
+    return isNaN(n) ? null : n;
+  };
+  const chave = (proc) => {
+    const p = proc.toUpperCase().replace(/N[º°]/g, '');
+    const n = ((p.match(/(\d+)\s*\/\s*\d{4}/) || [])[1] || '0').padStart(2, '0');
+    if (p.startsWith('CV')) return 'CV ' + n;
+    if (p.startsWith('CR')) return 'CR ' + n;
+    return (p.includes('SRP') ? 'SRP ' : '') + n;
+  };
+  const mapa = {
+    'Eventos e estruturas': ['06', '17', '19', '13', '20', '21', '28', 'SRP 05', 'SRP 06', 'SRP 09', 'SRP 14', 'SRP 15', 'SRP 18', 'CV 01'],
+    'Gráfica e promocionais': ['01', '14', '15', 'SRP 07', 'SRP 10', 'SRP 28', 'SRP 31', 'SRP 30', 'SRP 23', 'SRP 20', 'SRP 02', 'SRP 03'],
+    'TI e telecom': ['08', '05', '10', '11', '12', '16', '18', '24', '27'],
+    'Obras e manutenção predial': ['07', '23', '25', '26', 'SRP 29'],
+    'Alimentação e consumo': ['SRP 01', 'SRP 12', 'SRP 26', 'SRP 22', 'SRP 21', 'SRP 25', 'CR 01'],
+    'Transporte e veículos': ['09', 'SRP 13', 'SRP 19', 'SRP 27'],
+    'Serviços técnicos e segurança': ['03', 'SRP 11', 'SRP 17'],
+    'Mobiliário': ['02'],
+  };
+  const regras = [
+    ['TI e telecom', /internet|software|rede |tecnolog|videoconfer|tv corporativa|links?\b|datacenter/],
+    ['Gráfica e promocionais', /grafic|promociona|trofeu|impress|divulgac|bandeira|personalizad/],
+    ['Eventos e estruturas', /evento|estrutura|expoacre|estande|buffet|audiovisual|banheiro/],
+    ['Obras e manutenção predial', /manutencao|engenharia|reforma|adequacao|limpeza/],
+    ['Alimentação e consumo', /alimenta|agua mineral|material de consumo|expediente|copa/],
+    ['Transporte e veículos', /veicul|transporte|lavagem|frota/],
+    ['Serviços técnicos e segurança', /consultoria|auditoria|pesquisa|vigilancia|seguranca/],
+    ['Mobiliário', /moveis|mobiliario/],
+  ];
+  const categoria = (id, obj) => {
+    for (const [c, ids] of Object.entries(mapa)) if (ids.includes(id)) return c;
+    const o = obj.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    for (const [c, re] of regras) if (re.test(o)) return c;
+    return 'Outros';
+  };
+  const out = [];
+  for (const r of planilha) {
+    const proc = limpa(r.processo);
+    if (!proc || !r.objeto || !/\/\s*\d{4}/.test(proc)) continue;
+    const id = chave(proc);
+    const est = dinheiro(r.estimado), neg = dinheiro(r.negociado);
+    const pub = r.publicacao, hom = r.homologacao;
+    const dias = pub && hom ? Math.round((Date.parse(hom) - Date.parse(pub)) / 864e5) : null;
+    const valido = est != null && neg != null && est >= 100;
+    const pct = est && neg != null ? (est - neg) / est * 100 : null;
+    const obs = [];
+    if (r.estimado != null && !brOk(r.estimado) && dinheiro(r.estimado) != null) obs.push(`valor estimado digitado como '${limpa(r.estimado)}'`);
+    if (r.dias != null && typeof r.dias !== 'number') obs.push(`coluna 'Número de dias' contém '${limpa(r.dias)}' (recalculado pelas datas)`);
+    else if (typeof r.dias === 'number' && dias != null && Math.abs(r.dias - dias) > 1) obs.push(`'Número de dias' diz ${r.dias}, as datas dão ${dias}`);
+    const pp = pctPlan(r.pct);
+    if (valido && pp != null && Math.abs(pp - pct) > 0.5) obs.push(`% da planilha (${pp.toFixed(2).replace('.', ',')}%) difere da economia sobre o estimado (${pct.toFixed(2).replace('.', ',')}%)`);
+    out.push({
+      id, processo: proc.replace(/^SRP PE/i, 'PE SRP'),
+      modalidade: id.startsWith('CR') ? 'Credenciamento' : id.startsWith('CV') ? 'Convite' : id.startsWith('SRP') ? 'Pregão SRP' : 'Pregão',
+      categoria: categoria(id, limpa(r.objeto)), objeto: limpa(r.objeto),
+      publicacao: pub ?? null, homologacao: hom ?? null, mes_hom: hom ? String(hom).slice(0, 7) : null, dias,
+      estimado: est, negociado: neg, economia: est != null && neg != null ? est - neg : null, pct,
+      valido, alerta: est == null ? 'Sem valor (credenciamento)' : est < 100 ? 'Valores unitários (R$ 1,00 est.) — fora dos totais' : '',
+      n_vencedores: 0, obs_planilha: obs.join('; '), linha: r.linha,
+    });
+  }
+  // conta as vencedoras: a linha do processo e as linhas seguintes sem processo
+  let cur = null;
+  const byLinha = new Map(out.map((p) => [p.linha, p]));
+  for (const r of planilha) {
+    if (byLinha.has(r.linha)) cur = byLinha.get(r.linha);
+    else if (limpa(r.processo)) cur = null;
+    if (cur && limpa(r.empresa)) cur.n_vencedores += 1;
+  }
+  return out;
+},
+});
+
+dash.calc('vencedores', {
+  inputs: ['planilha'],
+  title: 'Empresas vencedoras por processo',
+  description: 'Uma linha por adjudicação, com CNPJ padronizado, nome unificado por CNPJ, sede e porte.',
+  fn: (planilha) => {
+  const limpa = (s) => String(s ?? '').replace(/ /g, ' ').replace(/\s+/g, ' ').trim();
+  const chave = (proc) => {
+    const p = proc.toUpperCase().replace(/N[º°]/g, '');
+    const n = ((p.match(/(\d+)\s*\/\s*\d{4}/) || [])[1] || '0').padStart(2, '0');
+    if (p.startsWith('CV')) return 'CV ' + n;
+    if (p.startsWith('CR')) return 'CR ' + n;
+    return (p.includes('SRP') ? 'SRP ' : '') + n;
+  };
+  const doc = (v) => {
+    let d = String(v ?? '').replace(/\D/g, '');
+    if (d.length === 13) d = d.slice(0, 8) + '0' + d.slice(8);
+    d = d.padStart(14, '0');
+    return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8, 12)}-${d.slice(12)}`;
+  };
+  const out = [];
+  let cur = null, n = 0;
+  for (const r of planilha) {
+    const proc = limpa(r.processo);
+    if (proc) {
+      if (r.objeto && /\/\s*\d{4}/.test(proc)) { cur = { id: chave(proc), processo: proc.replace(/^SRP PE/i, 'PE SRP') }; n = 0; } else { cur = null; continue; }
+    }
+    if (!cur || !limpa(r.empresa)) continue;
+    n += 1;
+    const sede = limpa(r.sede), uf = sede.includes('/') ? sede.split('/').pop().trim().toUpperCase() : '—';
+    const cidade = sede.split('/')[0].trim();
+    out.push({
+      id: cur.id, processo: cur.processo, empresa: limpa(r.empresa), cnpj: doc(r.cnpj), cidade, uf,
+      porte: limpa(r.porte).toUpperCase(), principal: n === 1,
+      origem: cidade === 'Rio Branco' ? 'Rio Branco' : cidade === 'Cruzeiro do Sul' ? 'Cruzeiro do Sul' : uf === 'AC' ? 'Interior do Acre' : 'Outros estados',
+    });
+  }
+  const nomes = {};
+  for (const w of out) { const k = w.empresa.toUpperCase(); (nomes[w.cnpj] ||= {})[k] = (nomes[w.cnpj][k] || 0) + 1; }
+  for (const w of out) {
+    const c = Object.entries(nomes[w.cnpj]).sort((a, b) => b[1] - a[1] || a[0].length - b[0].length);
+    w.fornecedor = c[0][0];
+  }
+  return out;
+},
+});
+
+dash.calc('qualidade', {
+  inputs: ['processos', 'vencedores'],
+  title: 'Pontos de atenção nos dados',
+  description: 'Divergências de cadastro, valores atípicos e inconsistências encontradas ao cruzar processos e fornecedores.',
+  fn: (processos, vencedores) => {
+  const fmt = (v) => v.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%';
+  const nomes = {}, portes = {}, rotulo = {};
+  for (const w of vencedores) {
+    (nomes[w.cnpj] ||= new Set()).add(w.empresa.toUpperCase());
+    (portes[w.cnpj] ||= new Set()).add(w.porte);
+    rotulo[w.cnpj] = w.fornecedor;
+  }
+  const q = [];
+  for (const c of Object.keys(nomes)) {
+    if (nomes[c].size > 1) q.push({ tipo: 'Mesmo CNPJ com nomes diferentes', detalhe: [...nomes[c]].sort().join(' / '), cnpj: c });
+    if (portes[c].size > 1) q.push({ tipo: 'Porte divergente entre processos', detalhe: `${rotulo[c]}: ${[...portes[c]].sort().join(', ')}`, cnpj: c });
+  }
+  for (const p of processos) {
+    if (p.alerta) q.push({ tipo: 'Valor atípico', detalhe: `${p.processo}: ${p.alerta}`, cnpj: '' });
+    if (p.valido && p.pct >= 60) q.push({ tipo: 'Economia acima de 60% (rever estimativa)', detalhe: `${p.processo}: ${fmt(p.pct)}`, cnpj: '' });
+    if (p.valido && p.pct === 0) q.push({ tipo: 'Economia zero', detalhe: `${p.processo}: valor negociado = estimado`, cnpj: '' });
+    if (p.valido && p.pct < 0) q.push({ tipo: 'Negociado acima do estimado', detalhe: `${p.processo}: ${fmt(p.pct)}`, cnpj: '' });
+    if (p.obs_planilha) for (const o of p.obs_planilha.split('; ')) q.push({ tipo: 'Inconsistência na planilha', detalhe: `${p.processo}: ${o}`, cnpj: '' });
+  }
+  return q;
+},
+});
+</script>
+<script>
+// ---------- cálculos ----------
+dash.calc('kpis', {
+  inputs: ['processos', 'vencedores'],
+  title: 'Indicadores gerais',
+  description: 'Totais com os filtros da página. Valores em reais excluem o credenciamento (sem valor) e o PE SRP 29 (valores unitários).',
+  fn: (processos, vencedores) => {
+    const prm = dash.params(), cat = prm.categoria || '', mod = prm.modalidade || '';
+    const P = processos.filter((p) => (!cat || p.categoria === cat) && (!mod || p.modalidade === mod));
+    const ids = new Set(P.map((p) => p.id));
+    const V = vencedores.filter((w) => ids.has(w.id));
+    const M = P.filter((p) => p.valido);
+    const sum = (a, f) => a.reduce((s, x) => s + (f(x) || 0), 0);
+    const est = sum(M, (p) => p.estimado), neg = sum(M, (p) => p.negociado);
+    const acre = new Set(V.filter((w) => w.principal && w.uf === 'AC').map((w) => w.id));
+    const negAcre = sum(M.filter((p) => acre.has(p.id)), (p) => p.negociado);
+    const dias = P.map((p) => p.dias).sort((a, b) => a - b);
+    const med = dias.length ? (dias.length % 2 ? dias[(dias.length - 1) / 2] : (dias[dias.length / 2 - 1] + dias[dias.length / 2]) / 2) : null;
+    return [{
+      processos: P.length, adjudicacoes: V.length, fornecedores: new Set(V.map((w) => w.cnpj)).size,
+      estimado: est, negociado: neg, economia: est - neg, pct: est ? (est - neg) / est * 100 : null,
+      prazo_medio: dias.length ? sum(dias, (d) => d) / dias.length : null, prazo_mediana: med,
+      pct_acre: V.length ? 100 * V.filter((w) => w.uf === 'AC').length / V.length : null,
+      pct_mpe: V.length ? 100 * V.filter((w) => w.porte === 'ME' || w.porte === 'EPP').length / V.length : null,
+      pct_valor_acre: neg ? 100 * negAcre / neg : null,
+    }];
+  },
+});
+
+dash.calc('por_mes', {
+  inputs: ['processos'],
+  title: 'Valores por mês de homologação',
+  description: 'Soma do estimado, negociado e economia dos processos homologados em cada mês, com os filtros da página.',
+  fn: (processos) => {
+    const prm = dash.params(), cat = prm.categoria || '', mod = prm.modalidade || '';
+    const P = processos.filter((p) => (!cat || p.categoria === cat) && (!mod || p.modalidade === mod));
+    const g = {};
+    for (const p of P) {
+      const r = g[p.mes_hom] || (g[p.mes_hom] = { mes: p.mes_hom, processos: 0, estimado: 0, negociado: 0 });
+      r.processos += 1;
+      if (p.valido) { r.estimado += p.estimado; r.negociado += p.negociado; }
+    }
+    return Object.values(g).sort((a, b) => a.mes.localeCompare(b.mes)).map((r) => ({ ...r, economia: r.estimado - r.negociado, pct: r.estimado ? (r.estimado - r.negociado) / r.estimado * 100 : null }));
+  },
+});
+
+dash.calc('por_categoria', {
+  inputs: ['processos'],
+  title: 'Valores por categoria de compra',
+  description: 'Soma do estimado e do negociado por categoria, e a economia ponderada pelo valor.',
+  fn: (processos) => {
+    const prm = dash.params(), cat = prm.categoria || '', mod = prm.modalidade || '';
+    const P = processos.filter((p) => (!cat || p.categoria === cat) && (!mod || p.modalidade === mod));
+    const g = {};
+    for (const p of P) {
+      const r = g[p.categoria] || (g[p.categoria] = { categoria: p.categoria, processos: 0, estimado: 0, negociado: 0 });
+      r.processos += 1;
+      if (p.valido) { r.estimado += p.estimado; r.negociado += p.negociado; }
+    }
+    return Object.values(g).map((r) => ({ ...r, economia: r.estimado - r.negociado, pct: r.estimado ? (r.estimado - r.negociado) / r.estimado * 100 : null })).sort((a, b) => b.estimado - a.estimado);
+  },
+});
+
+dash.calc('por_faixa', {
+  inputs: ['processos'],
+  title: 'Economia por faixa de prazo',
+  description: 'Processos com valor agrupados pelos dias entre publicação e homologação.',
+  fn: (processos) => {
+    const prm = dash.params(), cat = prm.categoria || '', mod = prm.modalidade || '';
+    const P = processos.filter((p) => p.valido && (!cat || p.categoria === cat) && (!mod || p.modalidade === mod));
+    const faixas = [['Até 15 dias', 0, 15], ['16 a 30 dias', 16, 30], ['31 a 45 dias', 31, 45], ['Mais de 45 dias', 46, 9999]];
+    return faixas.map(([faixa, a, b]) => {
+      const F = P.filter((p) => p.dias >= a && p.dias <= b);
+      const est = F.reduce((s, p) => s + p.estimado, 0), neg = F.reduce((s, p) => s + p.negociado, 0);
+      return { faixa, processos: F.length, estimado: est, economia: est - neg, pct: est ? (est - neg) / est * 100 : null };
+    });
+  },
+});
+
+dash.calc('por_modalidade', {
+  inputs: ['processos'],
+  title: 'Comparativo por modalidade',
+  description: 'Totais, economia ponderada, prazo médio e número médio de vencedoras por modalidade.',
+  fn: (processos) => {
+    const prm = dash.params(), cat = prm.categoria || '', mod = prm.modalidade || '';
+    const P = processos.filter((p) => (!cat || p.categoria === cat) && (!mod || p.modalidade === mod));
+    const g = {};
+    for (const p of P) {
+      const r = g[p.modalidade] || (g[p.modalidade] = { modalidade: p.modalidade, processos: 0, estimado: 0, negociado: 0, dias: 0, venc: 0 });
+      r.processos += 1; r.dias += p.dias; r.venc += p.n_vencedores;
+      if (p.valido) { r.estimado += p.estimado; r.negociado += p.negociado; }
+    }
+    return Object.values(g).map((r) => ({
+      modalidade: r.modalidade, processos: r.processos, estimado: r.estimado, negociado: r.negociado,
+      economia: r.estimado - r.negociado, pct: r.estimado ? (r.estimado - r.negociado) / r.estimado * 100 : null,
+      prazo_medio: r.dias / r.processos, vencedores_por_processo: r.venc / r.processos,
+    })).sort((a, b) => b.estimado - a.estimado);
+  },
+});
+
+dash.calc('por_origem', {
+  inputs: ['processos', 'vencedores'],
+  title: 'Adjudicações por sede da empresa',
+  description: 'Quantas adjudicações cada origem recebeu, e o valor negociado dos processos em que a empresa foi a 1ª vencedora.',
+  fn: (processos, vencedores) => {
+    const prm = dash.params(), cat = prm.categoria || '', mod = prm.modalidade || '';
+    const P = processos.filter((p) => (!cat || p.categoria === cat) && (!mod || p.modalidade === mod));
+    const byId = new Map(P.map((p) => [p.id, p]));
+    const V = vencedores.filter((w) => byId.has(w.id));
+    return ['Rio Branco', 'Cruzeiro do Sul', 'Interior do Acre', 'Outros estados'].map((origem) => {
+      const W = V.filter((w) => w.origem === origem);
+      const valor = W.filter((w) => w.principal && byId.get(w.id).valido).reduce((s, w) => s + byId.get(w.id).negociado, 0);
+      return { origem, adjudicacoes: W.length, share: V.length ? 100 * W.length / V.length : null, valor_principal: valor };
+    });
+  },
+});
+
+dash.calc('por_porte', {
+  inputs: ['processos', 'vencedores'],
+  title: 'Adjudicações por porte da empresa',
+  description: 'ME, EPP e demais portes, em número de adjudicações e no valor negociado como 1ª vencedora.',
+  fn: (processos, vencedores) => {
+    const prm = dash.params(), cat = prm.categoria || '', mod = prm.modalidade || '';
+    const P = processos.filter((p) => (!cat || p.categoria === cat) && (!mod || p.modalidade === mod));
+    const byId = new Map(P.map((p) => [p.id, p]));
+    const V = vencedores.filter((w) => byId.has(w.id));
+    return [['ME', 'Microempresa (ME)'], ['EPP', 'Empresa de pequeno porte (EPP)'], ['DEMAIS', 'Demais portes']].map(([porte, rotulo]) => {
+      const W = V.filter((w) => w.porte === porte);
+      const valor = W.filter((w) => w.principal && byId.get(w.id).valido).reduce((s, w) => s + byId.get(w.id).negociado, 0);
+      return { porte, rotulo, adjudicacoes: W.length, share: V.length ? 100 * W.length / V.length : null, valor_principal: valor };
+    });
+  },
+});
+
+dash.calc('porte_origem', {
+  inputs: ['processos', 'vencedores'],
+  title: 'Porte × sede das vencedoras',
+  description: 'Número de adjudicações cruzando o porte e a sede da empresa.',
+  fn: (processos, vencedores) => {
+    const prm = dash.params(), cat = prm.categoria || '', mod = prm.modalidade || '';
+    const ids = new Set(processos.filter((p) => (!cat || p.categoria === cat) && (!mod || p.modalidade === mod)).map((p) => p.id));
+    const V = vencedores.filter((w) => ids.has(w.id));
+    const col = { 'Rio Branco': 'rio_branco', 'Cruzeiro do Sul': 'cruzeiro_do_sul', 'Interior do Acre': 'interior_acre', 'Outros estados': 'outros_estados' };
+    return ['ME', 'EPP', 'DEMAIS'].map((porte) => {
+      const r = { porte, rio_branco: 0, cruzeiro_do_sul: 0, interior_acre: 0, outros_estados: 0, total: 0 };
+      for (const w of V) if (w.porte === porte) { r[col[w.origem]] += 1; r.total += 1; }
+      return r;
+    });
+  },
+});
+
+dash.calc('top_fornecedores', {
+  inputs: ['processos', 'vencedores'],
+  title: 'Fornecedores recorrentes',
+  description: 'Empresas (agrupadas por CNPJ) que venceram dois ou mais processos.',
+  fn: (processos, vencedores) => {
+    const prm = dash.params(), cat = prm.categoria || '', mod = prm.modalidade || '';
+    const byId = new Map(processos.filter((p) => (!cat || p.categoria === cat) && (!mod || p.modalidade === mod)).map((p) => [p.id, p]));
+    const g = {};
+    for (const w of vencedores) {
+      if (!byId.has(w.id)) continue;
+      const p = byId.get(w.id);
+      const r = g[w.cnpj] || (g[w.cnpj] = { fornecedor: w.fornecedor, cnpj: w.cnpj, sede: w.cidade + '/' + w.uf, portes: new Set(), ids: new Set(), cats: new Set(), principal: 0, valor_principal: 0 });
+      r.portes.add(w.porte); r.ids.add(w.id); r.cats.add(p.categoria);
+      if (w.principal) { r.principal += 1; if (p.valido) r.valor_principal += p.negociado; }
+    }
+    return Object.values(g).filter((r) => r.ids.size >= 2).map((r) => ({
+      fornecedor: r.fornecedor, cnpj: r.cnpj, sede: r.sede, porte: [...r.portes].join(' / '),
+      processos: r.ids.size, principal: r.principal, valor_principal: r.valor_principal, categorias: [...r.cats].join(', '),
+    })).sort((a, b) => b.processos - a.processos || b.valor_principal - a.valor_principal);
+  },
+});
+
+dash.calc('pareto', {
+  inputs: ['processos'],
+  title: 'Maiores processos por valor estimado',
+  description: 'Os 10 maiores processos e a participação acumulada no valor estimado total (com os filtros da página).',
+  fn: (processos) => {
+    const prm = dash.params(), cat = prm.categoria || '', mod = prm.modalidade || '';
+    const M = processos.filter((p) => p.valido && (!cat || p.categoria === cat) && (!mod || p.modalidade === mod)).sort((a, b) => b.estimado - a.estimado);
+    const tot = M.reduce((s, p) => s + p.estimado, 0);
+    let acc = 0;
+    return M.slice(0, 10).map((p) => { acc += p.estimado; return { processo: p.processo, categoria: p.categoria, estimado: p.estimado, pct_economia: p.pct, share: tot ? 100 * p.estimado / tot : null, acumulado_pct: tot ? 100 * acc / tot : null }; });
+  },
+});
+</script>
+<script>
+// ---------- desenhos ----------
+dash.draw('kpi', (el) => {
+  const d = dash.data(el.dataset.source || 'kpis');
+  if (d.status !== 'ok' || !d.data || !d.data[0]) { el.textContent = d.status === 'error' ? 'erro' : '—'; return; }
+  el.textContent = LIC.fmt(el.dataset.fmt, d.data[0][el.dataset.field]);
+});
+
+dash.draw('pareto-n', (el) => {
+  const d = dash.data('pareto');
+  el.textContent = d.status === 'ok' && d.data && d.data[4] ? LIC.pct(d.data[4].acumulado_pct) : '—';
+});
+
+dash.draw('mensal', (el) => {
+  const d = dash.data('por_mes');
+  if (!LIC.status(el, d)) return;
+  el.replaceChildren();
+  const rows = d.data;
+  if (!rows.length) { el.textContent = 'Nenhum processo no filtro atual.'; return; }
+  const W = Math.max(300, el.clientWidth || 600), H = 280, m = { t: 22, r: 8, b: 26, l: 62 };
+  const x = d3.scaleBand().domain(rows.map((r) => r.mes)).range([m.l, W - m.r]).padding(0.3);
+  const y = d3.scaleLinear().domain([0, d3.max(rows, (r) => r.estimado) || 1]).nice().range([H - m.b, m.t]);
+  const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`)
+    .attr('role', 'img').attr('aria-label', 'Colunas empilhadas com valor negociado e economia por mês de homologação');
+  const ticks = y.ticks(4);
+  svg.append('g').selectAll('line').data(ticks).join('line')
+    .attr('x1', m.l).attr('x2', W - m.r).attr('y1', (t) => y(t)).attr('y2', (t) => y(t))
+    .style('stroke', 'var(--cds-chart-grid)');
+  svg.append('g').selectAll('text').data(ticks).join('text')
+    .attr('x', m.l - 6).attr('y', (t) => y(t)).attr('dy', '0.32em').attr('text-anchor', 'end').text((t) => LIC.brlc(t));
+  const g = svg.append('g').selectAll('g').data(rows).join('g');
+  g.append('rect').attr('x', (r) => x(r.mes)).attr('width', x.bandwidth())
+    .attr('y', (r) => y(r.negociado)).attr('height', (r) => y(0) - y(r.negociado)).style('fill', dash.colors[0]);
+  g.append('rect').attr('x', (r) => x(r.mes)).attr('width', x.bandwidth())
+    .attr('y', (r) => y(r.estimado)).attr('height', (r) => y(r.negociado) - y(r.estimado)).style('fill', dash.colors[1]);
+  g.append('text').attr('class', 'lic-strong').attr('x', (r) => x(r.mes) + x.bandwidth() / 2).attr('y', (r) => y(r.estimado) - 6)
+    .attr('text-anchor', 'middle').text((r) => r.processos);
+  svg.append('g').selectAll('text').data(rows).join('text')
+    .attr('x', (r) => x(r.mes) + x.bandwidth() / 2).attr('y', H - 8).attr('text-anchor', 'middle').text((r) => (x.step() < 52 ? LIC.mes(r.mes).slice(0, 3) : LIC.mes(r.mes)));
+  svg.append('line').attr('x1', m.l).attr('x2', W - m.r).attr('y1', y(0)).attr('y2', y(0)).style('stroke', 'var(--cds-chart-axis)');
+  const tip = LIC.tip(el);
+  g.append('rect').attr('x', (r) => x(r.mes) - x.step() * x.paddingInner() / 2).attr('width', x.step())
+    .attr('y', m.t).attr('height', H - m.t - m.b).style('fill', 'transparent')
+    .on('pointermove', (ev, r) => LIC.showTip(el, tip, ev, [LIC.mes(r.mes) + ' · ' + r.processos + ' processos', 'Estimado: ' + LIC.brl(r.estimado), 'Negociado: ' + LIC.brl(r.negociado), 'Economia: ' + LIC.brl(r.economia) + ' (' + LIC.pct(r.pct) + ')']))
+    .on('pointerleave', () => { tip.hidden = true; });
+});
+
+dash.draw('categorias', (el) => {
+  const d = dash.data('por_categoria');
+  if (!LIC.status(el, d)) return;
+  LIC.bars(el, d.data.filter((r) => r.estimado > 0).map((r) => ({
+    label: r.categoria, outer: r.estimado, inner: r.negociado, text: LIC.pct(r.pct),
+    tip: [r.categoria, r.processos + ' processos', 'Estimado: ' + LIC.brl(r.estimado), 'Negociado: ' + LIC.brl(r.negociado), 'Economia: ' + LIC.brl(r.economia)],
+  })), dash.colors[0]);
+});
+
+dash.draw('pareto', (el) => {
+  const d = dash.data('pareto');
+  if (!LIC.status(el, d)) return;
+  LIC.bars(el, d.data.map((r) => ({
+    label: r.processo, outer: r.estimado, text: LIC.pct(r.acumulado_pct),
+    tip: [r.processo, r.categoria, 'Estimado: ' + LIC.brl(r.estimado), 'Participação: ' + LIC.pct(r.share), 'Economia obtida: ' + LIC.pct(r.pct_economia)],
+  })), dash.colors[0]);
+});
+
+dash.draw('origem', (el) => {
+  const d = dash.data('por_origem');
+  if (!LIC.status(el, d)) return;
+  LIC.bars(el, d.data.map((r, i) => ({
+    label: r.origem, outer: r.adjudicacoes, text: r.adjudicacoes + ' · ' + LIC.pct(r.share),
+    tip: [r.origem, r.adjudicacoes + ' adjudicações (' + LIC.pct(r.share) + ')', 'Valor como 1ª vencedora: ' + LIC.brl(r.valor_principal)],
+  })), dash.colors[0]);
+});
+
+dash.draw('porte', (el) => {
+  const d = dash.data('por_porte');
+  if (!LIC.status(el, d)) return;
+  LIC.bars(el, d.data.map((r) => ({
+    label: r.rotulo, outer: r.adjudicacoes, text: r.adjudicacoes + ' · ' + LIC.pct(r.share),
+    tip: [r.rotulo, r.adjudicacoes + ' adjudicações (' + LIC.pct(r.share) + ')', 'Valor como 1ª vencedora: ' + LIC.brl(r.valor_principal)],
+  })), dash.colors[1]);
+});
+
+dash.draw('dispersao', (el) => {
+  const d = dash.data('processos');
+  if (!LIC.status(el, d)) return;
+  el.replaceChildren();
+  const rows = LIC.filt(d.data).filter((p) => p.valido && p.pct != null);
+  if (!rows.length) { el.textContent = 'Nenhum processo com valor no filtro atual.'; return; }
+  const W = Math.max(300, el.clientWidth || 500), H = 300, m = { t: 14, r: 16, b: 40, l: 44 };
+  const x = d3.scaleLinear().domain([0, d3.max(rows, (p) => p.dias)]).nice().range([m.l, W - m.r]);
+  const y = d3.scaleLinear().domain([0, 100]).range([H - m.b, m.t]);
+  const r = d3.scaleSqrt().domain([0, d3.max(rows, (p) => p.estimado)]).range([3, 22]);
+  const cor = { 'Pregão': dash.colors[0], 'Pregão SRP': dash.colors[1], 'Convite': dash.colors[2] };
+  const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`)
+    .attr('role', 'img').attr('aria-label', 'Dispersão: dias até a homologação no eixo horizontal e economia percentual no vertical, um círculo por processo');
+  const yt = [0, 25, 50, 75, 100], xt = x.ticks(Math.max(3, Math.floor(W / 90)));
+  svg.append('g').selectAll('line').data(yt).join('line').attr('x1', m.l).attr('x2', W - m.r).attr('y1', (t) => y(t)).attr('y2', (t) => y(t)).style('stroke', 'var(--cds-chart-grid)');
+  svg.append('g').selectAll('text').data(yt).join('text').attr('x', m.l - 6).attr('y', (t) => y(t)).attr('dy', '0.32em').attr('text-anchor', 'end').text((t) => t + '%');
+  svg.append('g').selectAll('text').data(xt).join('text').attr('x', (t) => x(t)).attr('y', H - m.b + 16).attr('text-anchor', 'middle').text((t) => t);
+  svg.append('text').attr('x', (m.l + W - m.r) / 2).attr('y', H - 4).attr('text-anchor', 'middle').text('dias entre publicação e homologação');
+  const est = d3.sum(rows, (p) => p.estimado), neg = d3.sum(rows, (p) => p.negociado);
+  const media = est ? (est - neg) / est * 100 : 0;
+  svg.append('line').attr('x1', m.l).attr('x2', W - m.r).attr('y1', y(media)).attr('y2', y(media)).style('stroke', 'var(--cds-chart-reference)').style('stroke-dasharray', '4 4');
+  svg.append('text').attr('x', W - m.r).attr('y', y(media) - 6).attr('text-anchor', 'end').text('média ' + LIC.pct(media));
+  const tip = LIC.tip(el);
+  svg.append('g').selectAll('circle').data(rows.slice().sort((a, b) => b.estimado - a.estimado)).join('circle')
+    .attr('cx', (p) => x(p.dias)).attr('cy', (p) => y(Math.max(0, p.pct))).attr('r', (p) => r(p.estimado))
+    .style('fill', (p) => cor[p.modalidade] || dash.colors[3]).style('fill-opacity', 0.55)
+    .style('stroke', (p) => cor[p.modalidade] || dash.colors[3]).style('stroke-width', 1)
+    .on('pointermove', (ev, p) => LIC.showTip(el, tip, ev, [p.processo + ' · ' + p.categoria, p.dias + ' dias até homologar', 'Estimado: ' + LIC.brl(p.estimado), 'Economia: ' + LIC.pct(p.pct)]))
+    .on('pointerleave', () => { tip.hidden = true; });
+});
+
+dash.draw('tab-faixa', (tb) => {
+  const d = dash.data('por_faixa');
+  tb.replaceChildren();
+  if (d.status !== 'ok') return;
+  for (const r of d.data) {
+    const tr = document.createElement('tr'); tr.dataset.key = encodeURIComponent(r.faixa);
+    LIC.cell(tr, r.faixa); LIC.cell(tr, LIC.int(r.processos), 'n'); LIC.cell(tr, LIC.brlc(r.estimado), 'n'); LIC.cell(tr, LIC.pct(r.pct), 'n');
+    tb.append(tr);
+  }
+});
+
+dash.draw('tab-modalidade', (tb) => {
+  const d = dash.data('por_modalidade');
+  tb.replaceChildren();
+  if (d.status !== 'ok') return;
+  for (const r of d.data) {
+    const tr = document.createElement('tr'); tr.dataset.key = encodeURIComponent(r.modalidade);
+    LIC.cell(tr, r.modalidade); LIC.cell(tr, LIC.int(r.processos), 'n'); LIC.cell(tr, LIC.brl(r.estimado), 'n'); LIC.cell(tr, LIC.brl(r.negociado), 'n');
+    LIC.cell(tr, LIC.brl(r.economia), 'n'); LIC.cell(tr, r.estimado ? LIC.pct(r.pct) : '—', 'n'); LIC.cell(tr, LIC.dias(r.prazo_medio), 'n'); LIC.cell(tr, LIC.dec(r.vencedores_por_processo), 'n');
+    tb.append(tr);
+  }
+});
+
+dash.draw('tab-porte-origem', (tb) => {
+  const d = dash.data('porte_origem');
+  tb.replaceChildren();
+  if (d.status !== 'ok') return;
+  const nome = { ME: 'Microempresa (ME)', EPP: 'Pequeno porte (EPP)', DEMAIS: 'Demais portes' };
+  for (const r of d.data) {
+    const tr = document.createElement('tr'); tr.dataset.key = encodeURIComponent(r.porte);
+    LIC.cell(tr, nome[r.porte] || r.porte);
+    for (const k of ['rio_branco', 'cruzeiro_do_sul', 'interior_acre', 'outros_estados', 'total']) LIC.cell(tr, LIC.int(r[k]), 'n');
+    tb.append(tr);
+  }
+});
+
+dash.draw('tab-recorrentes', (tb) => {
+  const d = dash.data('top_fornecedores');
+  tb.replaceChildren();
+  if (d.status !== 'ok') return;
+  if (!d.data.length) { const tr = document.createElement('tr'); const td = LIC.cell(tr, 'Nenhuma empresa venceu mais de um processo no filtro atual.'); td.colSpan = 8; tb.append(tr); return; }
+  for (const r of d.data) {
+    const tr = document.createElement('tr'); tr.dataset.key = encodeURIComponent(r.cnpj);
+    LIC.cell(tr, r.fornecedor); LIC.cell(tr, r.cnpj); LIC.cell(tr, r.sede);
+    const tp = LIC.cell(tr, r.porte); if (r.porte.includes('/')) { tp.textContent = ''; tp.append(r.porte + ' '); LIC.chip(tp, 'divergente', 'warn'); }
+    LIC.cell(tr, LIC.int(r.processos), 'n'); LIC.cell(tr, LIC.int(r.principal), 'n'); LIC.cell(tr, r.valor_principal ? LIC.brl(r.valor_principal) : '—', 'n'); LIC.cell(tr, r.categorias);
+    tb.append(tr);
+  }
+});
+
+dash.draw('tab-processos', (tb) => {
+  const d = dash.data('processos');
+  tb.replaceChildren();
+  if (d.status !== 'ok') return;
+  const { key, dir } = LIC.sort;
+  const rows = LIC.filt(d.data).slice().sort((a, b) => {
+    const va = a[key], vb = b[key];
+    if (va == null && vb == null) return 0; if (va == null) return 1; if (vb == null) return -1;
+    return (typeof va === 'number' ? va - vb : String(va).localeCompare(String(vb), 'pt-BR', { numeric: true })) * dir;
+  });
+  if (!rows.length) { const tr = document.createElement('tr'); const td = LIC.cell(tr, 'Nenhum processo no filtro atual.'); td.colSpan = 9; tb.append(tr); return; }
+  for (const p of rows) {
+    const tr = document.createElement('tr'); tr.dataset.key = encodeURIComponent(p.id);
+    const t = LIC.cell(tr, p.processo);
+    const o = document.createElement('span'); o.className = 'lic-obj'; o.textContent = p.objeto.length > 140 ? p.objeto.slice(0, 137) + '…' : p.objeto; o.title = p.objeto; t.append(o);
+    LIC.cell(tr, p.categoria); LIC.cell(tr, LIC.date(p.homologacao)); LIC.cell(tr, LIC.int(p.dias), 'n');
+    LIC.cell(tr, p.estimado == null ? '—' : LIC.brl(p.estimado), 'n'); LIC.cell(tr, p.negociado == null ? '—' : LIC.brl(p.negociado), 'n');
+    LIC.cell(tr, p.valido ? LIC.pct(p.pct) : '—', 'n'); LIC.cell(tr, LIC.int(p.n_vencedores), 'n');
+    const a = LIC.cell(tr, '');
+    if (p.alerta) LIC.chip(a, p.estimado == null ? 'sem valor' : 'valores unitários', 'warn');
+    else if (p.pct >= 60) LIC.chip(a, 'economia > 60%', 'warn');
+    else if (p.pct === 0) LIC.chip(a, 'sem economia', 'bad');
+    if (p.dias > 60) LIC.chip(a, 'prazo longo', 'warn');
+    tb.append(tr);
+  }
+});
+
+dash.draw('tab-qualidade', (tb) => {
+  const d = dash.data('qualidade');
+  tb.replaceChildren();
+  if (d.status !== 'ok') return;
+  for (const q of d.data) {
+    const tr = document.createElement('tr'); tr.dataset.key = encodeURIComponent(q.tipo) + ',' + encodeURIComponent(q.detalhe);
+    LIC.cell(tr, q.tipo); LIC.cell(tr, q.detalhe); LIC.cell(tr, q.cnpj || '—');
+    tb.append(tr);
+  }
+});
+</script>
+<script>
+// ---------- carga do arquivo ----------
+(() => {
+  const box = document.getElementById('carga'), msg = document.getElementById('carga-msg'), inp = document.getElementById('carga-arquivo'), fonte = document.getElementById('atualizado');
+  const texto = (buf) => { try { return new TextDecoder('utf-8', { fatal: true }).decode(buf); } catch { return new TextDecoder('windows-1252').decode(buf); } };
+  const usa = (buf, origem) => {
+    try {
+      const rows = lerCSV(texto(buf));
+      dash.setSource('planilha', { status: 'ok', data: rows });
+      box.hidden = true;
+      fonte.textContent = origem;
+    } catch (e) {
+      msg.textContent = 'Não consegui ler o arquivo: ' + e.message;
+      inp.parentElement.hidden = false;
+      dash.setSource('planilha', { status: 'error', data: [] });
+    }
+  };
+  inp.addEventListener('change', async () => { const f = inp.files[0]; if (f) usa(await f.arrayBuffer(), f.name + ' (aberto neste navegador)'); });
+  fetch('Relt_3.csv', { cache: 'no-cache' })
+    .then(async (r) => {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const lm = r.headers.get('Last-Modified');
+      const quando = lm ? ' · publicado em ' + new Date(lm).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : '';
+      usa(await r.arrayBuffer(), 'Relt_3.csv' + quando);
+    })
+    .catch(() => {
+      msg.textContent = 'Não consegui carregar o arquivo Relt_3.csv. Ele precisa estar na mesma pasta desta página, publicada em um servidor. Para ver a página no seu computador, escolha o arquivo abaixo.';
+      inp.parentElement.hidden = false;
+      dash.setSource('planilha', { status: 'error', data: [] });
+    });
+})();
+</script>
+</body>
+</html>
